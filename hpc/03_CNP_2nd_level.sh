@@ -1,4 +1,5 @@
 #!/bin/bash
+#SBATCH -J cnp_2nd
 #SBATCH --array=1-200
 #SBATCH -t 10:00:00
 #SBATCH --mem=4G

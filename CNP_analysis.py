@@ -42,6 +42,9 @@ def get_parser():
                         help='work directory')
     parser.add_argument('--variant', action='store',
                         help='preprocessing workflow name')
+
+    parser.add_argument('--smoothing', default=5.0, type=float,
+                        help='smooth input data')
     return parser
 
 
@@ -137,9 +140,6 @@ def main():
         masker = Node(maths.ApplyMask(
             in_file=prep_file, mask_file=GROUP_MASK), name='masker')
 
-        bim = Node(afni.BlurInMask(
-            mask=GROUP_MASK, outputtype='NIFTI_GZ', fwhm=5.0), name='bim')
-
         l1 = Node(SpecifyModel(
             input_units='secs',
             time_repetition=2,
@@ -160,8 +160,6 @@ def main():
         CNPflow = Workflow(name=wfname)
         CNPflow.base_dir = work_dir
         CNPflow.connect([
-            (masker, bim, [('out_file', 'in_file')]),
-            (bim, l1, [('out_file', 'functional_runs')]),
             (conf2movpar, l1, [('out', 'realignment_parameters')]),
             (regressors, l1, [('ev_files', 'event_files')]),
             (regressors, l1model, [('ortho', 'orthogonalization')]),
@@ -172,6 +170,20 @@ def main():
                 ('ev_files', 'ev_files')]),
             (l1model, l1estimate, [('fsf_files', 'fsf_file')])
         ])
+
+        if args.smoothing > 0.0:
+            bim = Node(afni.BlurInMask(
+                mask=GROUP_MASK, outputtype='NIFTI_GZ',
+                fwhm=args.smoothing), name='bim')
+
+            CNPflow.connect([
+                (masker, bim, [('out_file', 'in_file')]),
+                (bim, l1, [('out_file', 'functional_runs')]),
+            ])
+        else:
+            CNPflow.connect([
+                (masker, l1, [('out_file', 'functional_runs')]),
+            ])
 
         CNPflow.write_graph(graph2use='colored')
         CNPflow.run('MultiProc')

@@ -73,7 +73,7 @@ def main():
     results = pd.DataFrame()
 
     # Pattern: l2-jd/fslfeat_stopsignal_N120_R100_S0
-    basedir = os.path.join(os.environ.get("PREPBASEDIR"), "fmriprep_vs_feat_2.0-jd", 'l2-jd')
+    basedir = os.path.join(os.environ.get("PREPBASEDIR"), "fmriprep_vs_feat_nosmooth", 'l2-jd')
     l1results = [os.path.basename(f)[:-1]
                  for f in sorted(glob.glob(os.path.join(basedir, '*_S0')))]
     allT = {

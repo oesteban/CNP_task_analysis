@@ -1,6 +1,8 @@
 #!/bin/bash
-#SBATCH -J cnp_jd_2
-#SBATCH --array=1-514
+#SBATCH -J cnp_1st
+##SBATCH --array=1-514
+#SBATCH --array=3,5
+
 #SBATCH -t 12:00:00
 #SBATCH -c 2
 #SBATCH -n 1
